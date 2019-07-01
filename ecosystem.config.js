@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'chat app',
       script: './src/index.js',
-      node_args: '--experimental-modules'
+      node_args: '-r esm'
     }
   ]
 }
