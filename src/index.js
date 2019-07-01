@@ -119,5 +119,5 @@ io.on('connection', socket => {
 
 router(app, express)
 
-const port = process.env.PORT
+const port = process.env.PORTAL
 server.listen(port, () => console.log(`🚀  server is running @port ${port}`))
