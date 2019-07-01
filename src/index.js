@@ -119,5 +119,4 @@ io.on('connection', socket => {
 
 router(app, express)
 
-const port = process.env.PORTAL
-server.listen(port, () => console.log(`🚀  server is running @port ${port}`))
+server.listen(4040, () => console.log(`🚀  server is running @port ${4040}`))
