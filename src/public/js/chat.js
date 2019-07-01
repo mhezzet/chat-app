@@ -6,10 +6,17 @@ const $input = $form.querySelector('input')
 const $send = $form.querySelector('button')
 const $messages = document.getElementById('messages')
 const $locationButton = document.getElementById('send-location')
+const $sidebar = document.getElementById('sidebar')
 
 //templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationTemplate = document.querySelector('#location-template').innerHTML
+const sideBarTemplate = document.querySelector('#sidebar-template').innerHTML
+
+//options
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true
+})
 
 $form.addEventListener('submit', e => {
   e.preventDefault()
@@ -22,7 +29,6 @@ $form.addEventListener('submit', e => {
     return ($send.disabled = false)
   }
 
-  $form.setAttribute('disabled', true)
   socket.emit('addMessage', message, () => {
     $input.value = ''
     $input.focus()
@@ -31,19 +37,30 @@ $form.addEventListener('submit', e => {
   })
 })
 
-socket.on('newMessage', ({ text, createdAt }) => {
+socket.on('usersList', ({ room, users }) => {
+  const html = Mustache.render(sideBarTemplate, {
+    room,
+    users
+  })
+
+  $sidebar.innerHTML = html
+})
+
+socket.on('newMessage', ({ text, createdAt, username }) => {
   const html = Mustache.render(messageTemplate, {
     message: text,
-    createdAt: moment(createdAt).format('h:mm a')
+    createdAt: moment(createdAt).format('h:mm a'),
+    username
   })
 
   $messages.insertAdjacentHTML('afterbegin', html)
 })
 
-socket.on('newLocation', ({ text, createdAt }) => {
+socket.on('newLocation', ({ text, createdAt, username }) => {
   const html = Mustache.render(locationTemplate, {
     location: text,
-    createdAt: moment(createdAt).format('h:mm a')
+    createdAt: moment(createdAt).format('h:mm a'),
+    username
   })
 
   $messages.insertAdjacentHTML('afterbegin', html)
@@ -68,4 +85,11 @@ $locationButton.addEventListener('click', () => {
       }
     )
   })
+})
+
+socket.emit('join', { username, room }, error => {
+  if (error) {
+    alert(error)
+    location.href = '/'
+  }
 })
